@@ -7,7 +7,8 @@ import numpy as np
 import pyjack
 
 
-# Owner is a new person
+#Add NEW extension
+
 #Super Reality => The class of object that can contain reality at different location
 class infinity_Stones:
     def __init__(self , Owner , location , Object , Color , Ability):
