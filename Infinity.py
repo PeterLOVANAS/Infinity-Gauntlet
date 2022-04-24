@@ -6,6 +6,8 @@ import copy
 import numpy as np
 import pyjack
 
+
+#Extension
 #Super Reality => The class of object that can contain reality at different location
 class infinity_Stones:
     def __init__(self , Owner , location , Object , Color , Ability):
@@ -260,7 +262,7 @@ class Reality: #Create your own reality simulation world (When using reality sto
 
 
 
-    def dictSlice(self , obj = Matter or Life or Reality, length = int):
+    def dictSlice(self , obj = Matter or Life, length = int):
         dic = obj.__dict__
         print(dic)
         print(length)
