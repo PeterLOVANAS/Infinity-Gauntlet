@@ -10,19 +10,7 @@ import pyjack
 #Add NEW extension
 
 #Super Reality => The class of object that can contain reality at different location
-class infinity_Stones:
-    def __init__(self , Owner , location , Object , Color , Ability):
-        self.location = location
-        self.Owner = Owner
-        self._Color = Color
-        self.Object = Object
-        self._Ability = Ability
 
-    def show_StonesInfo(self):
-        print(self._Ability)
-    
-    def show_Color(self):
-        print(self._Color)
       
     
 class MindType:
@@ -113,7 +101,7 @@ class Soul:
           
 
 class Matter:
-    def __init__(self , Name = str  ,Mass = float , Shape = str , location = str ,matterState = str,state = str,propertime = Time,timerate= int,exprlist = [], **kwargs):
+    def __init__(self , Name = str  ,Mass = float , Shape = str , location = str ,matterState = str,state = str,propertime = Time,timerate= int,exprlist = [],iden = int, **kwargs):
         self.Name = Name
         self.Shape = Shape
         self.location = location
@@ -138,6 +126,7 @@ class Matter:
         self.exprlist = exprlist
         obj = Utility
         self.Uti = obj
+        self.iden = iden
         self.kw = kwargs
         #self.Abillity  = argdict #Other atrribute we should know about the object
 
@@ -174,6 +163,9 @@ class Matter:
 
     def __eq__(self, other):
         return (self.__dict__) == (other.__dict__)
+
+    def __hash__(self):
+        return hash((self.Name ,self.iden))
 
 
 class Life(Matter):
@@ -234,11 +226,12 @@ class Reality: #Create your own reality simulation world (When using reality sto
         if all(isinstance(k , Life) for k in lifelist) == True and all(k.location == self.location for k in lifelist) == True:
             self.lifelist = lifelist
         else:
-            print("all life should be life object or the state of the life object should be illusion (i)")
+            print("all life should be life object and all life object should be in the same location as the world")
+
         if all(isinstance(k , Matter) for k in matter_list) == True  and all(k.location == self.location for k in matter_list) == True:
             self.matter_list = matter_list
         else:
-            print("all matter should be matter object or the matter should not be a life object")
+            print("all matter should be matter object all matter object should be in the same location as the world")
 
         self.propertime = propertime
         if all(x.timerate == timerate for x in lifelist) == True and all(x.timerate == timerate for x in matter_list) == True:
@@ -260,6 +253,44 @@ class Reality: #Create your own reality simulation world (When using reality sto
 
             self.timerate = timerate
 
+    @property
+    def lifelst(self):
+        return self.lifelist
+
+    @property
+    def matter_lst(self):
+        return self.matter_list
+
+    @lifelst.setter
+    def lifelst(self , lifelist = list):
+        for i in lifelist.copy():
+            if isinstance(i, Life) == True:
+                pass
+            elif isinstance(i ,Life) ==False:
+                lifelist.remove(i)
+                raise Exception(f"{i} , all life should be life object")
+            if i.location == self.location:
+                pass
+            elif i.location != self.location:
+                lifelist.remove(i)
+                #raise Exception(f"{i} , all life object should be in the same location as the world")
+        self.lifelist = lifelist
+
+
+    @matter_lst.setter
+    def matter_lst(self ,matter_list = list):
+        for i in matter_list.copy():
+            if isinstance(i, Life) == True:
+                pass
+            elif isinstance(i ,Life) ==False:
+                matter_list.remove(i)
+                raise Exception(f"{i} , all matter should be matter object")
+            if i.location == self.location:
+                pass
+            elif i.location != self.location:
+                matter_list.remove(i)
+                #raise Exception(f"{i} , all matter object should be in the same location as the world")
+        self.matter_list = matter_list
 
 
 
@@ -486,20 +517,33 @@ class Multiverse:
 
 
 
+class infinity_Stones:
+    def __init__(self , Owner = Life , location = str , Color = str, Ability = str): #Stone location doesn't always equal to owner location
+        self.location = location
+        self.Owner = Owner
+        self._Color = Color
+        self._Ability = Ability
 
+    def show_StonesInfo(self):
+        print(self._Ability)
+
+    def show_Color(self):
+        print(self._Color)
         
 class Space_Stone(infinity_Stones): 
     __name = "Space Stone"
     #1.Teleport object (Export object) to here  2.create black holes 
 
-    def __init__(self, Owner, location, Object, Color = "Blue", Ability= "Travel between places instantaneously" ):
-        super().__init__(Owner, location, Object, Color, Ability)
+    def __init__(self, Owner, location, Color = "Blue", Ability= "Travel between places instantaneously" ):
+        super().__init__(Owner, location, Color, Ability)
         
     def Teleport(self , Origin  ,Destination , what = set): # When you can split yourself ,the spuls object will be diffrent;therefore, your life object will be diffrent
-        if all(isinstance(x , str) for x in what) == True:
+        if all(isinstance(x , Life) for x in what) == True:
           pass
-        elif all(isinstance(x , str) for x in what) == False:
-          print("Must be a name")
+        if all(isinstance(x , Matter) for x in what) == True:
+          pass
+        else:
+          print("Must be a life or matter object")
           
         if len(Origin) == len(Destination) == len(what):
           pass
@@ -508,15 +552,25 @@ class Space_Stone(infinity_Stones):
           
         for O ,D ,W in zip(Origin , Destination , what):
           print(f"{W} have travel from {O} to {D}")
+          W.location = D
     
     def SingleOrigin(self , des , wh = set, ori = str): #Multiple Destination  
         tlst = []
+        if len(wh) == len(des):
+            pass
+        else:
+            print("The len is not equal")
         for i in range(len(des)):
           tlst.append(ori)
         self.Teleport(tlst , des , wh)
     
     def SingleDestination(self , ori , wh = set, des = str): #Multiple origin 
         tlst = []
+        if len(wh) == len(ori):
+            pass
+        else:
+            print("The len is not equal")
+
         for i in range(len(ori)):
           tlst.append(des)
         self.Teleport(ori , tlst , wh)
@@ -530,8 +584,11 @@ class Space_Stone(infinity_Stones):
         self.Teleport(tlst1  , tlst2 , wh)
         
           
-    def TeleportOwner(self , ori = str , des = str):
-        self.Teleport([ori] , [des] , {self.Owner})
+    def TeleportOwner(self ,des = str):
+        if self.location == self.Owner.location:
+            self.Teleport([self.Owner.location] , [des] , {self.Owner})
+        elif self.location != self.Owner.location:
+            print("Space stone can't teleport you!")
         
     
         
@@ -542,8 +599,8 @@ class Mind_Stone(infinity_Stones):
     #Read mind 
     __name = "Mind Stone"
 
-    def __init__(self, Owner, location, Object, Color = "Yellow", Ability = "Control Minds"):
-        super().__init__(Owner, location, Object, Color, Ability)
+    def __init__(self, Owner, location, Color = "Yellow", Ability = "Control Minds"):
+        super().__init__(Owner, location, Color, Ability)
 
     def ControlState(self, Target, time):
         checklst=  []
@@ -578,8 +635,8 @@ class Mind_Stone(infinity_Stones):
         
 
 class Soul_Stone(infinity_Stones):
-    def __init__(self, Owner, location, Object, Color = "Orange", Ability = "Control Souls"):
-        super().__init__(Owner, location, Object, Color, Ability)
+    def __init__(self, Owner, location,  Color = "Orange", Ability = "Control Souls"):
+        super().__init__(Owner, location,  Color, Ability)
         self.__Pool = set()
     
     # Identify spirit (check at the state), resurrect (Change states) , split spirit (Copied object ,and make the state to "s" and the control status to T) , control (check the control status and make it to T)
@@ -668,8 +725,8 @@ class Soul_Stone(infinity_Stones):
       
       
 class Reality_Stone(infinity_Stones):
-    def __init__(self, Owner, location, Object, Color = "Red", Ability = "Alter reality and matter"):
-        super().__init__(Owner, location, Object, Color, Ability)
+    def __init__(self, Owner, location,  Color = "Red", Ability = "Alter reality and matter"):
+        super().__init__(Owner, location, Color, Ability)
 
     def show_reality(self , World = list):
         Anslst = []
@@ -810,8 +867,8 @@ class Reality_Stone(infinity_Stones):
         return Matters
 
 class Time_Stone(infinity_Stones):
-    def __init__(self, Owner, location, Object, Color = "Green", Ability = "Control and manipulate time"):
-        super().__init__(Owner, location, Object, Color, Ability)
+    def __init__(self, Owner, location,  Color = "Green", Ability = "Control and manipulate time"):
+        super().__init__(Owner, location, Color, Ability)
 
     def Forward_Reverse(self , Tlo = Timeline , tw = Time , objlst = list , world  =Reality , indexlst = []):
         tl = Tlo.timeline
@@ -933,8 +990,8 @@ class Time_Stone(infinity_Stones):
 '''
 
 class Power_Stone(infinity_Stones):
-    def __init__(self, Owner, location, Object, Color = "Purple", Ability = "Manipulate energy; increased strength"):
-        super().__init__(Owner, location, Object, Color, Ability)
+    def __init__(self, Owner, location,Color = "Purple", Ability = "Manipulate energy; increased strength"):
+        super().__init__(Owner, location,  Color, Ability)
 
     def Pain_inducement(self , life = Life):
         lim_s = life.Limit_Strength
@@ -1014,7 +1071,20 @@ class Power_Stone(infinity_Stones):
   
   
 if __name__ == '__main__':
+    Souls1 = Soul("Tony Stark" , False ,"a")
+    L1 = Life(Name = "Tony Stark", Mass =  65 , Shape="Human shape" , location="NYC" , matterState="mul" ,state="r" ,MindState=False ,age = 50 ,Souls=Souls1 ,Strength= 40, Limit_Strength=250,Pain_limit=210,propertime=Time(2022,4,24,17,13,3) ,iden= 1, timerate= 10)
+    S1 = Space_Stone(L1 , "NYC")
+    #S1.TeleportOwner("Paris")
+    #print(L1)
+    w1 = Reality(location="NYC", theme="NYC style" , state= "r" ,Temp= 20 ,lifelist=[L1],matter_list=[],propertime= Time(2022,4,24,17,13,3),timerate= 10,)
+    S1.TeleportOwner("Paris")
+    w1.lifelst = [L1]
+    print(w1)
 
+
+
+
+    '''
     S1 = Space_Stone("Loki" , "Asgard", "Tesserract")
     S1.show_Color()
     S1.show_StonesInfo()
@@ -1041,20 +1111,22 @@ if __name__ == '__main__':
     L1 = Life(Name = "John" , Mass = 45 , Shape = "Human shape" , location = "Earth" , matterState = "mul" ,state = "r" , MindState= False , age = 17 ,Souls= Soul("John" , False , "a"), Strength=50 , Limit_Strength=100, propertime = Time(2022,4,16,12,5,34) , timerate = 10 , Pain_limit= 70)
     M1 = Matter(Name = "Laptop" , Mass = 2  ,Shape = "laptop shape" , location = "Earth" , matterState= "s" , state = "r", propertime = Time(2022,4,16,12,5,34)  ,timerate = 10)
     '''
+'''
     k = L1.__dict__.copy()
     #k["Limit_Strength"] = L1._limit_strength
     k["Strength"] = 100
     L1.__init__(**k)
     print(L1)
     print(L1.Souls.state)
-    '''
+'''
+'''
     W1 = Reality(location = "Earth" , theme = "New york" , state = "r" , Temp= 20 , lifelist = [L1] , matter_list = [M1] , propertime = Time(2022,4,16,12,5,34) , timerate = 10  )
     S6 = Power_Stone("Thanos" , "Xandar" , "Orb")
     S6.Planet_destruction(W1)
     print(L1.Souls.state)
     print(M1.Shape)
     print(W1.matter_list)
-
+'''
 '''
 
 #Mat1 = Matter(Name = "Macbook" , Mass = 12 , Shape = "Notebook shape" , location = "Earth" , matterState = "s" ,state = "r", cpu = 1500 , ram = 16 , owner = "James Madison")
