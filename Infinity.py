@@ -529,6 +529,12 @@ class infinity_Stones:
 
     def show_Color(self):
         print(self._Color)
+
+    def checking_of_usage(self):
+        if self.Owner.location == self.location:
+            pass
+        elif self.Owner.location != self.location:
+            raise Exception("You aren't in the same location as this infinity stone!")
         
 class Space_Stone(infinity_Stones): 
     __name = "Space Stone"
@@ -538,6 +544,7 @@ class Space_Stone(infinity_Stones):
         super().__init__(Owner, location, Color, Ability)
         
     def Teleport(self , Origin  ,Destination , what = set): # When you can split yourself ,the spuls object will be diffrent;therefore, your life object will be diffrent
+        self.checking_of_usage()
         if all(isinstance(x , Life) for x in what) == True:
           pass
         if all(isinstance(x , Matter) for x in what) == True:
@@ -584,11 +591,11 @@ class Space_Stone(infinity_Stones):
         self.Teleport(tlst1  , tlst2 , wh)
         
           
-    def TeleportOwner(self ,des = str):
-        if self.location == self.Owner.location:
-            self.Teleport([self.Owner.location] , [des] , {self.Owner})
-        elif self.location != self.Owner.location:
-            print("Space stone can't teleport you!")
+    def TeleportOwner(self ,des = str): #This is for owner who have only himself and the space stone ,if the owner have other things to teleport with, please use self.Teleport()
+
+        self.Teleport([self.Owner.location] , [des] , {self.Owner})
+        self.location = des
+
         
     
         
@@ -1050,6 +1057,55 @@ class Power_Stone(infinity_Stones):
         World.__init__(**k)
 
 
+class infinity_gauntlet:
+    def __init__(self):
+
+        self.Time_stone = None
+        self.Power_stone = None
+        self.Reality_stone = None
+        self.Mind_stone =  None
+        self.Space_stone = None
+        self.Soul_stone = None
+        #raise(AttributeError("Maybe your aren't collect that stone yet"))
+
+
+    def Stones(self ,stones = set):
+        self.Time_stone = None
+        self.Power_stone = None
+        self.Reality_stone = None
+        self.Mind_stone =  None
+        self.Space_stone = None
+        self.Soul_stone = None
+
+        s_lst= []
+        for k in stones:
+            s_lst.append(k)
+        if 1 <= len(stones) <= 6 and all(isinstance(x , infinity_Stones) for x in stones) == True and all(x.Owner == s_lst[0].Owner for x in s_lst) and all(x.location == s_lst[0].location for x in s_lst):
+            pass
+        else:
+            raise Exception("The infinity gauntlet can contain the infinity stones from 1 to 6 stones")
+
+        for i in stones:
+            if isinstance(i,Time_Stone) == True:
+                self.Time_stone = i
+            elif isinstance(i , Power_Stone) == True:
+                self.Power_stone = i
+            elif isinstance(i , Reality_Stone) == True:
+                self.Reality_stone = i
+            elif isinstance(i , Space_Stone) == True:
+                self.Space_stone = i
+            elif isinstance(i , Mind_Stone) == True:
+                self.Mind_stone = i
+            elif isinstance(i , Soul_Stone) == True:
+                self.Soul_stone = i
+
+
+    #def time_stone(self):
+   #     for i in self.stones:
+    #        if isinstance(i , Time_Stone) == True:
+
+
+
 
 
 
@@ -1077,9 +1133,20 @@ if __name__ == '__main__':
     #S1.TeleportOwner("Paris")
     #print(L1)
     w1 = Reality(location="NYC", theme="NYC style" , state= "r" ,Temp= 20 ,lifelist=[L1],matter_list=[],propertime= Time(2022,4,24,17,13,3),timerate= 10,)
+
+    #w1.lifelst = [L1]
+    #print(w1)
+    S2 = Time_Stone(Owner= L1 , location="NYC")
+    S3 = Power_Stone(Owner= L1 , location="NYC")
     S1.TeleportOwner("Paris")
-    w1.lifelst = [L1]
-    print(w1)
+    gauntlet = infinity_gauntlet()
+    gauntlet.Stones(stones= {S2 , S3})
+    print(L1)
+    gauntlet.Power_stone.Pain_inducement(L1)
+    print(L1)
+    #gauntlet.Stones(stones={S2})
+    #gauntlet.Power_stone.Overload_Strength(L1)
+    #print(L1)
 
 
 
