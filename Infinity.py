@@ -6,7 +6,7 @@ import copy
 import numpy as np
 import pyjack
 
-
+#Add new Infinity Gauntlet
 #Add NEW extension
 
 #Super Reality => The class of object that can contain reality at different location
