@@ -5,6 +5,7 @@ import itertools
 import copy
 import numpy as np
 import pyjack
+from math import *
 
 #Add new Infinity Gauntlet
 #Add NEW extension
@@ -32,6 +33,8 @@ class RealityType:
 #Object : Life object , World object , Time object (Derived from World) , Soul object 
 
 
+
+
 class Utility:
     def UpdateVallst(value , lst = list):
         lst2 = lst.copy()
@@ -39,6 +42,18 @@ class Utility:
         return lst2
         #self.ValueFromExp = lst1.copy()
         #del self.__dict__["lst"]
+
+
+
+
+
+
+
+
+
+
+
+
 
 class Time:
     def __init__(self, year, month , day , hour , minute , second):
@@ -76,6 +91,231 @@ class Time:
 
     def __hash__(self):
         return hash((self.year , self.month , self.day , self.hour , self.minute , self.second))
+
+class Cartesian_Coordinates:
+    def __init__(self,x = float , y = float , z = float):
+        self.limit_x = None
+        self.limit_y = None
+        self.limit_z = None
+
+        if self.limit_x or self.limit_y or self.limit_z == None:
+            self.x = x
+            self.y = y
+            self.z =z
+
+        else:
+
+            if self.limit_x[0] <= x <= self.limit_x[1]:
+                self.x = x
+            else:
+                raise Exception("All values must in the limited range")
+
+            if self.limit_y[0] <= y <= self.limit_y[1]:
+                self.y= y
+            else:
+                raise Exception("All values must in the limited range")
+
+            if self.limit_z[0] <= z <= self.limit_z[1]:
+                self.z = z
+            else:
+                raise Exception("All values must in the limited range")
+
+
+
+    def Set_limit_x(self , limx = tuple):
+        if len(limx) == 2:
+            if limx[0] < limx[1]:
+                self.limit_x = limx
+            else:
+                raise Exception("The limit require in the specific range")
+        else:
+            raise Exception("The limit require in the specific range")
+
+    def Set_limit_y(self , limy = tuple):
+        if len(limy) == 2:
+            if limy[0] < limy[1]:
+                self.limit_y = limy
+            else:
+                raise Exception("The limit require in the specific range")
+        else:
+            raise Exception("The limit require in the specific range")
+
+    def Set_limit_z(self , limz = tuple):
+        if len(limz) == 2:
+            if limz[0] < limz[1]:
+                self.limit_z = limz
+            else:
+                raise Exception("The limit require in the specific range")
+        else:
+            raise Exception("The limit require in the specific range")
+
+    def Show_limit(self):
+        return (self.limit_x , self.limit_y ,self.limit_z)
+
+    def __repr__(self):
+        return {"Position" : (self.x,  self.y , self.z) , "Condition" : (self.limit_x , self.limit_y , self.limit_z)}
+
+    def __eq__(self,other):
+        return (self.x, self.y , self.z ,self.limit_x ,self.limit_y, self.limit_z) == (other.x, other.y , other.z ,other.limit_x , other.limit_y, other.limit_z)
+
+    def __hash__(self):
+        return hash((self.x, self.y , self.z ,self.limit_x ,self.limit_y, self.limit_z))
+
+class Polar_Coordinates:
+    def __init__(self,r = float , t = float , p = float):
+        self.limit_r = None
+        self.limit_t = None
+        self.limit_p = None
+
+        if r > 0 and 0 <= t <= 360 and 0 <= p <= 360:
+            pass
+        else:
+            raise Exception("All values must in the rules limited range")
+        if self.limit_r or self.limit_t or self.limit_p == None:
+            self.r = r
+            self.t = t
+            self.p = p
+
+        else:
+
+            if self.limit_r[0] < r < self.limit_r[1]:
+                self.r = r
+            else:
+                raise Exception("All values must in the limited range")
+
+            if self.limit_t[0] < t < self.limit_t[1]:
+                self.t= t
+            else:
+                raise Exception("All values must in the limited range")
+
+            if self.limit_p[0] < p < self.limit_p[1]:
+                self.p= p
+            else:
+                raise Exception("All values must in the limited range")
+
+
+
+    def Set_limit_r(self , limr = tuple):
+        if len(limr) == 2:
+            if all(x > 0 for x in limr) == True :
+                pass
+            else:
+                raise Exception("r or radius can only be positive")
+
+            if limr[0] < limr[1]:
+                self.limit_r = limr
+            else:
+                raise Exception("The limit require in the specific range")
+        else:
+            raise Exception("The limit require in the specific range")
+
+    def Set_limit_t(self , limt = tuple):
+        if len(limt) == 2:
+            if all(0 <= x <= 360 for x in limt) == True:
+                pass
+            else:
+                raise Exception("The angle should be in the range [0,360]")
+            if limt[0] < limt[1]:
+                self.limit_t = limt
+            else:
+                raise Exception("The limit require in the specific range")
+        else:
+            raise Exception("The limit require in the specific range")
+
+    def Set_limit_z(self , limp = tuple):
+        if len(limp) == 2:
+            if all(0 <= x <= 360 for x in limp) == True:
+                pass
+            else:
+                raise Exception("The angle should be in the range [0,360]")
+            if limp[0] < limp[1]:
+                self.limit_p = limp
+            else:
+                raise Exception("The limit require in the specific range")
+        else:
+            raise Exception("The limit require in the specific range")
+
+    def Show_limit(self):
+        return (self.limit_r , self.limit_t ,self.limit_p)
+
+    def __repr__(self):
+        return {"Position" : (self.r,  self.t , self.p) , "Condition" : (self.limit_r, self.limit_t , self.limit_p)}
+
+    def __eq__(self,other):
+        return (self.r, self.t , self.p ,self.limit_r ,self.limit_t, self.limit_p) == (other.r, other.t , other.p ,other.limit_r , other.limit_t, other.limit_p)
+
+    def __hash__(self):
+        return hash((self.r, self.t , self.p ,self.limit_r ,self.limit_t, self.limit_p))
+
+class Calculation:
+
+     def Polar_to_Cart(self , Pobj = Polar_Coordinates): #, r =  float , t = float , p = float):
+        r = Pobj.r
+        t = Pobj.t
+        p = Pobj.p
+
+        if r > 0:
+            pass
+        else:
+             raise Exception("The radius should be positive")
+
+        if 0 <= t <= 360 and 0 <= p <= 360 :
+            pass
+        else:
+            raise Exception("The angle must be in the range, [0,360]")
+
+        x = r*sin(radians(t))*cos(radians(p))
+        y = r*sin(radians(t))*sin(radians(p))
+        z = r*cos(radians(t))
+
+        return Cartesian_Coordinates(x,y,z)
+
+
+     def Measure_Distance(self,fobj, iobj):#xi = float , yi = float ,zi = float , xf = float , yf = float , zf = float):
+        if isinstance(fobj, Cartesian_Coordinates) and isinstance(iobj, Cartesian_Coordinates) == True:
+            xf = fobj.x
+            yf = fobj.y
+            zf = fobj.z
+
+            xi = iobj.x
+            yi = iobj.y
+            zi = iobj.z
+
+        elif isinstance(fobj, Polar_Coordinates) and isinstance(iobj, Polar_Coordinates) == True:
+            fobj2 = self.Polar_to_Cart(fobj)
+            iobj2 = self.Polar_to_Cart(iobj)
+
+            xf = fobj2.x
+            yf = fobj2.y
+            zf = fobj2.z
+
+            xi = iobj2.x
+            yi = iobj2.y
+            zi = iobj2.z
+
+        else:
+            raise Exception("This method can only measure distance in Cartesian or Polar coordinates")
+
+        del_x = xf - xi
+        del_y = yf - yi
+        del_z = zf - zi
+        s = sqrt(del_x**2 + del_y**2 + del_z**2)
+        return s
+
+class Location:
+    def __init__(self, World_name = str , Local = Cartesian_Coordinates or Polar_Coordinates):
+        self.World_name = World_name
+        self.Local = Local
+        self.Calculate= Calculation
+
+    def __repr__(self):
+        return {"World" : self.World_name , "Local Coordinate" : self.Local}
+
+    def __eq__(self, other):
+        return (self.World_name , self.Local) == (other.World_name , other.Local)
+
+    def __hash__(self):
+        return hash((self.World_name , self.Local))
 
 class Soul:
     def __init__(self , name = str , control_status = bool , state  = str, numSplit = 0):
@@ -214,8 +454,12 @@ class Life(Matter):
 
 
 class Reality: #Create your own reality simulation world (When using reality stone) , ilusion reality
-    def __init__(self, location , theme ,state, timeIllu = None , Temp = float , lifelist = list ,matter_list = list , propertime= Time, timerate = int ,Multiverse = []): #lifelist and matter_list is all the life or the matter inside this reality object (just SOME specific object)
-        self.location = location #Position in space
+    def __init__(self,name , theme ,state, timeIllu = None , Temp = float , lifelist = list ,matter_list = list , propertime= Time, timerate = int ,Multiverse = [] , Coordinate = Cartesian_Coordinates or Polar_Coordinates): #lifelist and matter_list is all the life or the matter inside this reality object (just SOME specific object)
+        self.name= name
+
+        self.location = None #Position in space
+
+
         self.theme = theme
         self.timeIllu = timeIllu
         if state in ["i" , "r"]: # "i" stand for illusion and "r" stand for real
@@ -252,6 +496,19 @@ class Reality: #Create your own reality simulation world (When using reality sto
                     self.matter_list.remove(x)
 
             self.timerate = timerate
+
+        if isinstance(Coordinate, Cartesian_Coordinates) == True:
+            if Coordinate.x and Coordinate.y and Coordinate.z == 0:
+                self.Coordinate = Coordinate
+            else:
+                raise Exception("Coordinate setting require every value to be 0 ")
+
+        elif isinstance(Coordinate, Polar_Coordinates) == True:
+            if Coordinate.r and Coordinate.t and Coordinate.p == 0:
+                self.Coordinate = Coordinate
+            else:
+                raise Exception("Coordinate setting require every value to be 0 ")
+
 
     @property
     def lifelst(self):
@@ -291,6 +548,13 @@ class Reality: #Create your own reality simulation world (When using reality sto
                 matter_list.remove(i)
                 #raise Exception(f"{i} , all matter object should be in the same location as the world")
         self.matter_list = matter_list
+
+
+    def LocateSet(self , location = Location):
+        if location.World_name == self.name and location.Local.Show_limit == self.Show_limit and type(location.Local) == type(self.Coordinate) :
+            self.location = location
+        else:
+            raise Exception("Need to be in the same world and use the same coordinate and limit")
 
 
 
