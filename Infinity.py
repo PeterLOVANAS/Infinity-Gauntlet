@@ -44,10 +44,43 @@ class Utility:
         #del self.__dict__["lst"]
 
 
+class Customization:
+    def __init__(self,Type = str, exprdict = {}, **kwargs):
+        self.exprdict = exprdict
+        self.Type= Type
+        self.ValueFromExp = {}
+        self.kw = kwargs
 
+    def run(self , exp): #exp is expression of a function create under reality stone and if "name" == main: #May need realities where you do it
+        Abi = self.__dict__
+        #print(Abi)
 
+        if all(isinstance(x , RealityType) for x in self.exprdict):
+            pass
+        else:
+            print("All elements in expression list should be Reality type")
+        if exp in self.exprdict:
+            pass
+        elif exp not in self.exprdict:
+            print(f"You can choose the ability only from the expression list, {self.exprdict}")
 
+        if isinstance(exp , RealityType) == True:
+            expT = exp.dt
+            #print(expT.rstrip())
+            #code = compile(expT, "<string>", "eval")
+            #loc = {}
+            ans = exec(expT, Abi)
+            #ans = loc['return_me']
+        elif isinstance(exp , RealityType) == False:
+            return "the expression should been create by reality stone"
+    # *exec() won't return values
 
+    def __repr__(self):
+        dic = self.__dict__
+        return f"{dic}"
+
+    def type(self):
+        return self.Type
 
 
 
@@ -160,7 +193,11 @@ class Cartesian_Coordinates:
         self.Set_limit_y(limtup[1])
         self.Set_limit_z(limtup[2])
 
-
+    def Check_Default(self):
+        if self.x == self.y == self.z == 0:
+            return True
+        else:
+            return False
 
     def Show_limit(self):
         return (self.limit_x , self.limit_y ,self.limit_z)
@@ -270,6 +307,12 @@ class Polar_Coordinates:
     def Show_position(self):
         return (self.r, self.t,  self.p)
 
+    def Check_Default(self):
+        if self.r == self.t == self.p == 0:
+            return True
+        else:
+            return False
+
     def __repr__(self):
         dic = {"Position" : (self.r,  self.t , self.p) , "Condition" : (self.limit_r, self.limit_t , self.limit_p)}
         return f"{dic}"
@@ -335,6 +378,72 @@ class Calculation:
         s = sqrt(del_x**2 + del_y**2 + del_z**2)
         return s
 
+class LocateData:
+    def __init__(self):
+        self.dict_mul = {}
+
+
+
+
+    def Config_dict_mul(self,Mul_ID =int,dt = tuple):
+        lst = ["R","SR"] # R for Reality , SR for Super Reality
+
+        if dt[0] == lst[0] and len(dt) == 2:
+            if isinstance(dt[1] ,Polar_Coordinates) == True or  isinstance(dt[1] ,Cartesian_Coordinates) == True:
+                if dt[1].Check_Default() == True:
+                    self.dict_mul[str(Mul_ID)] = dt
+                elif dt[1].Check_Default() == False:
+                    raise Exception("The coordinate should be set in default, (0,0,0)")
+
+            else:
+                raise Exception("The coordinates can be only Polar or Cartesian")
+
+        elif dt[0] == lst[1] and len(dt) == 3:
+            if isinstance(dt[1], dict) == True and all(isinstance(x , str) for x in list(dt[1].keys())) == True:
+                if all(isinstance(x , Cartesian_Coordinates) and x.Check_Default() for x in list(dt[1].values())) == True or all(isinstance(x , Polar_Coordinates) and x.Check_Default() for x in list(dt[1].values())) == True:
+                    if isinstance(dt[2] , dict) == True or isinstance(dt[2] ,Polar_Coordinates) == True or  isinstance(dt[2] ,Cartesian_Coordinates) == True:
+                        if isinstance(dt[2] , dict) == True:
+                            if all(isinstance(x , str) for x in list(dt[2].keys())) == True:
+                                if all(isinstance(x , Cartesian_Coordinates) for x in list(dt[2].values())) == True or all(isinstance(x , Polar_Coordinates) for x in list(dt[2].values())) == True:
+                                    pass
+                                else:
+                                    raise Exception("This is SuperID-dict and it should have an ID (in str) as a key and have values in terms of coordinate set at default values")
+                            else:
+                                raise Exception("This is SuperID-dict and it should have an ID (in str) as a key")
+
+                        else:
+                            if dt[2].Check_Default() == True:
+                                pass
+                            elif dt[2].Check_Default() == False:
+                                raise Exception("The coordinate should be set in default, (0,0,0)")
+                    else:
+                        raise Exception("The third element can only be a SuperId_dict OR Super-Coordinate")
+                else:
+                    raise Exception("The value inside the dict_local should be a coordinate and be set defaults")
+            else:
+                raise Exception("The key of dict_local must to a string")
+
+        elif dt[0] == lst[1] and len(dt) == 2:
+            if isinstance(dt[1], dict) == True and all(isinstance(int(x) , int) and isinstance(x , str) for x in list(dt[1].keys())) == True:
+                if all(isinstance(x , Cartesian_Coordinates) and x.Check_Default() for x in list(dt[1].values())) == True or all(isinstance(x , Polar_Coordinates) and x.Check_Default() for x in list(dt[1].values())) == True:
+                    pass
+                else:
+                    raise Exception("This is SuperID-dict and it should have an ID (in str) as a key and have values in terms of coordinate set at default values")
+            else:
+                raise Exception("This is SuperID-dict and it should have an ID (in str) as a key and must be a number")
+
+        self.dict_mul[str(Mul_ID)] = dt
+
+
+
+
+class Location:
+    def __init__(self, Mul_ID = "def" , Super_coor = "def" , local = "def" ):
+        self.Mul_ID = Mul_ID
+        self.Super_coor = Super_coor
+        self.local = local
+
+'''
 class Location:
     def __init__(self, World_name = str , Local = Cartesian_Coordinates or Polar_Coordinates):
         self.World_name = World_name
@@ -350,7 +459,7 @@ class Location:
 
     def __hash__(self):
         return hash((self.World_name , self.Local))
-
+'''
 class Soul:
     def __init__(self , name = str , control_status = bool , state  = str, numSplit = 0):
         self.name = name
@@ -375,7 +484,7 @@ class Soul:
           
 
 class Matter:
-    def __init__(self , Name = str  ,Mass = float , Shape = str , location = Location ,matterState = str,state = str,propertime = Time,timerate= int,exprlist = [],iden = int, **kwargs):
+    def __init__(self , Name = str  ,Mass = float , Shape = str , location = Location ,matterState = str,state = str,propertime = Time,timerate= int,exprdict = {},iden = int, **kwargs):
         self.Name = Name
         self.Shape = Shape
         self.location = location
@@ -394,10 +503,10 @@ class Matter:
             return "Matter has only two states illusion (i) or real (r)"
         self.propertime = propertime
         self.timerate= timerate
-        self.ValueFromExp = []
+        self.ValueFromExp = {}
         argdict = {"Name" : self.Name , "Mass" : self.Mass, "Shape" : self.Shape , "location" : self.location , "matterState" : self.matterState , "state" : self.state , "propertime" : self.propertime,"timerate" : self.timerate,  "Vallst" : self.ValueFromExp}
         argdict.update(kwargs)
-        self.exprlist = exprlist
+        self.exprdict = exprdict
         obj = Utility
         self.Uti = obj
         self.iden = iden
@@ -412,14 +521,14 @@ class Matter:
         Abi = self.__dict__
         #print(Abi)
 
-        if all(isinstance(x , RealityType) for x in self.exprlist):
+        if all(isinstance(x , RealityType) for x in self.exprdict):
             pass
         else:
             print("All elements in expression list should be Reality type")
-        if exp in self.exprlist:
+        if exp in self.exprdict:
             pass
-        elif exp not in self.exprlist:
-            print(f"You can choose the ability only from the expression list, {self.exprlist}")
+        elif exp not in self.exprdict:
+            print(f"You can choose the ability only from the expression list, {self.exprdict}")
 
         if isinstance(exp , RealityType) == True:
             expT = exp.dt
@@ -444,8 +553,8 @@ class Matter:
 
 
 class Life(Matter):
-  def __init__(self , Name = str  ,Mass = float , Shape = str , location = str ,matterState = str,state = str ,  MindState = bool , age = float , Souls = Soul,Strength = float,Limit_Strength = float,Pain_limit = float,propertime= Time,timerate = int,exprlist= [] , **kwargs):
-      super().__init__(Name ,Mass, Shape , location, matterState , state,propertime, timerate,exprlist,  **kwargs)
+  def __init__(self , Name = str  ,Mass = float , Shape = str , location = str ,matterState = str,state = str ,  MindState = bool , age = float , Souls = Soul,Strength = float,Limit_Strength = float,Pain_limit = float,propertime= Time,timerate = int,exprset= {} , **kwargs):
+      super().__init__(Name ,Mass, Shape , location, matterState , state,propertime, timerate,exprset,  **kwargs)
 
       self.MindState = MindState #Control by a mind stone or not? (T/F)
       self.age = age
@@ -489,7 +598,7 @@ class Life(Matter):
 
 
 class Reality: #Create your own reality simulation world (When using reality stone) , ilusion reality
-    def __init__(self,name , theme ,state, timeIllu = None , Temp = float , lifelist = list ,matter_list = list , propertime= Time, timerate = int ,Multiverse = [] , Coordinate = Cartesian_Coordinates or Polar_Coordinates): #lifelist and matter_list is all the life or the matter inside this reality object (just SOME specific object)
+    def __init__(self,name , theme ,state, timeIllu = None , Temp = float , lifelist = list ,matter_list = list , propertime= Time, timerate = int ,Multiverse = [] , exprdict = {},Coordinate = Cartesian_Coordinates or Polar_Coordinates, **kwargs): #lifelist and matter_list is all the life or the matter inside this reality object (just SOME specific object)
         self.name= name
 
         self.location = None #Position in space
@@ -503,17 +612,43 @@ class Reality: #Create your own reality simulation world (When using reality sto
             print("Reality has only two states illusion (i) or real (r)")
         self.Temp = Temp
 
+
         if all(x == 0 for x in Coordinate.Show_position()) == True:
             self.Coordinate = Coordinate
         elif all(x == 0 for x in Coordinate.Show_position()) == False:
             raise Exception("Coordinate setting require every value to be 0 ")
 
-        if all(isinstance(k , Life) for k in lifelist) == True and all(k.location.World_name == self.name and type(k.location.Local) == type(self.Coordinate) and k.location.Local.Show_limit() == self.Coordinate.Show_limit() for k in lifelist) == True :
+
+
+
+
+        if all(isinstance(k , Life) for k in lifelist) == True and all(k.location.World_name == self.name and type(k.location.Local) == type(self.Coordinate) for k in lifelist) == True :
+            if self.location == None:
+                if all(k.location.Local.Show_limit() == self.Coordinate.Show_limit() for k in lifelist) == True:
+                    pass
+                elif all(k.location.Local.Show_limit() == self.Coordinate.Show_limit() for k in lifelist) == False:
+                    raise Exception("the limit of your object must match")
+            elif self.location == Location:
+                if all(k.location.Local.Show_limit() == self.location.Local.Show_limit() for k in lifelist) == True:
+                    pass
+                elif all(k.location.Local.Show_limit() == self.location.Local.Show_limit() for k in lifelist) == False:
+                    raise Exception("the limit of your object must match")
             self.lifelist = lifelist
         else:
             print("all life should be life object and all life object should be in the same location as the world")
 
-        if all(isinstance(k , Matter) for k in matter_list) == True  and all(k.location.World_name == self.name and type(k.location.Local) == type(self.Coordinate) and k.location.Local.Show_limit() == self.Coordinate.Show_limit() for k in matter_list) == True:
+        if all(isinstance(k , Matter) for k in matter_list) == True  and all(k.location.World_name == self.name and type(k.location.Local) == type(self.Coordinate) for k in matter_list) == True:
+            if self.location == None:
+                if all(k.location.Local.Show_limit() == self.Coordinate.Show_limit() for k in matter_list) == True:
+                    pass
+                elif all(k.location.Local.Show_limit() == self.Coordinate.Show_limit() for k in matter_list) == False:
+                    raise Exception("the limit of your object must match")
+            elif self.location == Location:
+                if all(k.location.Local.Show_limit() == self.location.Local.Show_limit() for k in matter_list) == True:
+                    pass
+                elif all(k.location.Local.Show_limit() == self.location.Local.Show_limit() for k in matter_list) == False:
+                    raise Exception("the limit of your object must match")
+
             self.matter_list = matter_list
         else:
             print("all matter should be matter object all matter object should be in the same location as the world")
@@ -537,7 +672,9 @@ class Reality: #Create your own reality simulation world (When using reality sto
                     self.matter_list.remove(x)
 
             self.timerate = timerate
-
+            self.exprdict = exprdict
+            self.ValueFromExp = {}
+            self.kw=  kwargs
 
         '''
         if isinstance(Coordinate, Cartesian_Coordinates) == True:
@@ -604,6 +741,57 @@ class Reality: #Create your own reality simulation world (When using reality sto
         else:
             raise Exception("Need to be in the same world and use the same coordinate and limit")
 
+        """
+        Explanation of the Coordinate system
+        Reality coordinate : The ID map of world that is intercommunicated and interrelated in some super reality
+        Local coordinate:
+            1.The Large world : self.coordinate
+            2.The Small world : self.location.Local
+            
+            EX. Wanda Maximoff created the Hex, a small world that placed on New Jersey state which is on the planet named 
+            "Earth". 
+            
+            [1] Worlds = Reality(name = "The hex" , ... ,coordinate = Polar(0,0,0) )
+            # In this case, the large world is Earth which has a coordinate set to (0,0,0) in self.coordinate 
+            
+            [2] Worlds.LocateSet(Location) 
+            # the Location object contain the name of the large World (in this case, Earth) and the local coordinate that is specific to this SMALL world (in this case, The Hex)
+            # This means if you want to put your matter object inside the small world you should use   self.location.Local   to access Local coordinate of a small world
+            
+        *The term, Local coordinate, is quite confused sometimes as it can be use as a description on coordinate in the level of both large and small world. Therefore, we must to distinguish 
+        between large and small world when use this term.
+        
+        # Note [things that should be adjusted] : 
+                1.Lifelist and matter_list definition on location 
+                2.self.LocateSet
+                3.self.coordinate in __init__()
+            
+        """
+
+
+    def run(self , exp): #exp is expression of a function create under reality stone and if "name" == main: #May need realities where you do it
+        Abi = self.__dict__
+        #print(Abi)
+
+        if all(isinstance(x , RealityType) for x in self.exprdict):
+            pass
+        else:
+            print("All elements in expression list should be Reality type")
+        if exp in self.exprdict:
+            pass
+        elif exp not in self.exprdict:
+            print(f"You can choose the ability only from the expression list, {self.exprdict}")
+
+        if isinstance(exp , RealityType) == True:
+            expT = exp.dt
+            #print(expT.rstrip())
+            #code = compile(expT, "<string>", "eval")
+            #loc = {}
+            ans = exec(expT, Abi)
+            #ans = loc['return_me']
+        elif isinstance(exp , RealityType) == False:
+            return "the expression should been create by reality stone"
+    # *exec() won't return values
 
 
     def dictSlice(self , obj = Matter or Life, length = int):
@@ -1450,15 +1638,30 @@ if __name__ == '__main__':
     EL1.Transfer_limit(EarthCoor.Show_limit())
     EL1.Set_Position(5,20,90)
 
+    EL2 = Polar_Coordinates()
+    EL2.Transfer_limit(EarthCoor.Show_limit())
+    EL2.Set_Position(8,20,90)
+
     Souls1 = Soul("Tony Stark" , False ,"a")
     L1 = Life(Name = "Tony Stark", Mass =  65 , Shape="Human shape" , location=Location("Earth-617" , EL1) , matterState="mul" ,state="r" ,MindState=False ,age = 50 ,Souls=Souls1 ,Strength= 40, Limit_Strength=250,Pain_limit=210,propertime=Time(2022,4,24,17,13,3) ,iden= 1, timerate= 10)
     #S1 = Space_Stone(L1 , "NYC")
     #S1.TeleportOwner("Paris")
     #print(L1)
 
-    w1 = Reality(name ="Earth-617", theme="Planet" , state= "r" ,Temp= 20 ,lifelist=[L1],matter_list=[],propertime= Time(2022,4,24,17,13,3),timerate= 10,Coordinate = EarthCoor)
-    w1.LocateSet(Location("Earth-616", EarthCoor))
-    print(w1)
+#    w1 = Reality(name ="Earth-617", theme="Planet" , state= "r" ,Temp= 20 ,lifelist=[L1],matter_list=[],propertime= Time(2022,4,24,17,13,3),timerate= 10,Coordinate = EarthCoor)
+#    w1.LocateSet(Location("Earth-616", EL2))
+#   print(w1)
+
+    obj = Customization(Type= "City" , name= "Paris",Country = "France" , Landmarks = ["Eiffel Tower" ,"The Louvre Museum" , "Arc de Triomphe"])
+    print(obj.type())
+
+    UniCoor = Polar_Coordinates()
+    UniCoor.Set_Position(0,0,0)
+    LD = LocateData()
+    LD.Config_dict_mul(179867,("R" , EarthCoor))
+    LD.Config_dict_mul(717 , ("SR" , {"Earth" : EarthCoor} , UniCoor ) )
+    LD.Config_dict_mul(4568 ,("SR" , {"457" : EarthCoor}) )
+    print(LD.dict_mul)
     '''
     #w1.lifelst = [L1]
     #print(w1)
