@@ -189,9 +189,12 @@ class Cartesian_Coordinates:
                 raise Exception("All values must in the limited range")
 
     def Transfer_limit(self , limtup = tuple):
-        self.Set_limit_x(limtup[0])
-        self.Set_limit_y(limtup[1])
-        self.Set_limit_z(limtup[2])
+        if all(x != None for x in limtup) == True:
+            self.Set_limit_x(limtup[0])
+            self.Set_limit_y(limtup[1])
+            self.Set_limit_z(limtup[2])
+        elif all(x != None for x in limtup) == False:
+            pass
 
     def Check_Default(self):
         if self.x == self.y == self.z == 0:
@@ -297,9 +300,13 @@ class Polar_Coordinates:
                 raise Exception("All values must in the limited range")
 
     def Transfer_limit(self , limtup = tuple):
-        self.Set_limit_r(limtup[0])
-        self.Set_limit_t(limtup[1])
-        self.Set_limit_p(limtup[2])
+        if all(x != None for x in limtup) == True:
+            self.Set_limit_r(limtup[0])
+            self.Set_limit_t(limtup[1])
+            self.Set_limit_p(limtup[2])
+
+        elif all(x != None for x in limtup) == False:
+            pass
 
     def Show_limit(self):
         return (self.limit_r , self.limit_t ,self.limit_p)
@@ -438,10 +445,100 @@ class LocateData:
 
 
 class Location:
-    def __init__(self, Mul_ID = "def" , Super_coor = "def" , local = "def" ):
-        self.Mul_ID = Mul_ID
-        self.Super_coor = Super_coor
-        self.local = local
+    def __init__(self, dicdata = LocateData):
+        self.Mul_ID = None
+        self.Super_coor = None
+        self.local = None
+        self.SuperID = None
+        self.nameLocal = None
+
+        self.dicdata = dicdata.dict_mul
+
+    def Set_Location(self, Mul_ID = "def" , Super_coor = "def" ,SuperID = "def" ,nameLocal = "def" ,local = "def" ):
+        dic = self.dicdata
+        tup = None
+        if isinstance(int(Mul_ID) , int) == True:
+            pass
+        elif isinstance(int(Mul_ID) , int) == False:
+            raise Exception("Multiversal ID should be a number but type: String")
+
+        if Mul_ID in dic.keys():
+            tup = dic[Mul_ID]
+            self.Mul_ID = Mul_ID
+        elif Mul_ID not in dic.keys():
+            raise Exception("The multiversal ID should be in the dict")
+
+        if tup[0] == "R":
+            if type(tup[1]) is type(local) and local.Show_limit() == tup[1].Show_limit():
+                self.local = local
+            elif type(tup[1]) is not type(local) and local.Show_limit() != tup[1].Show_limit():
+                raise Exception("The Local coordinate should have the same limit")
+
+        elif tup[0] == "SR":
+            if len(tup) == 2:
+                if isinstance(int(SuperID) , int) == True:
+                    pass
+                elif isinstance(int(SuperID) , int) == False:
+                    raise Exception("Super ID should be a number but type: String")
+
+                if SuperID in tup[1].keys():
+                    self.SuperID = SuperID
+                elif SuperID not in tup[1].keys():
+                    raise Exception("SuperID is not in the dic")
+
+                if type(tup[1][SuperID]) is type(local) and tup[1][SuperID].Show_limit() == local.Show_limit():
+                    self.local = local
+                else:
+                    raise Exception("The type should be the same and limit of the coordinate should be as well")
+
+            elif len(tup) == 3:
+
+                if type(tup[2]) == type(Super_coor) and tup[2].Show_limit() == Super_coor.Show_limit():
+                    self.Super_coor = Super_coor
+                else:
+                    raise Exception("The type should be the same and limit of the coordinate should be as well")
+
+                if nameLocal != "def":
+                    if isinstance(local, Polar_Coordinates) == True or isinstance(local , Cartesian_Coordinates) == True:
+                        pass
+                    else:
+                        raise Exception("local need to be a coordinate")
+                    if nameLocal in tup[1].keys():
+                        self.nameLocal = nameLocal
+                    elif nameLocal not in tup[1].keys():
+                        raise Exception("name is not in the dic")
+
+                    if type(tup[1][nameLocal]) is type(local) and tup[1][nameLocal].Show_limit() == local.Show_limit():
+                        self.local = local
+                    else:
+                        raise Exception("The type should be the same and limit of the coordinate should be as well")
+
+    def __repr__(self):
+        dic = self.__dict__
+        checklst= []
+        st= ""
+        for k,v in dic.items():
+            checklst.append((k,v))
+        print(checklst)
+        for i in checklst:
+            if isinstance(i[1] , Polar_Coordinates) == True or isinstance(i[1], Cartesian_Coordinates):
+                st += f"{i[0]} : {i[1]} "
+            elif isinstance(i[1] , str) == True:
+                st += f"{i[0]} : {i[1]} "
+            else:
+                pass
+
+        return st
+
+
+
+
+
+
+
+
+
+
 
 '''
 class Location:
@@ -1642,8 +1739,12 @@ if __name__ == '__main__':
     EL2.Transfer_limit(EarthCoor.Show_limit())
     EL2.Set_Position(8,20,90)
 
+    EL3 = Polar_Coordinates()
+    EL3.Transfer_limit(EarthCoor.Show_limit())
+    EL3.Set_Position(45,78,90)
+
     Souls1 = Soul("Tony Stark" , False ,"a")
-    L1 = Life(Name = "Tony Stark", Mass =  65 , Shape="Human shape" , location=Location("Earth-617" , EL1) , matterState="mul" ,state="r" ,MindState=False ,age = 50 ,Souls=Souls1 ,Strength= 40, Limit_Strength=250,Pain_limit=210,propertime=Time(2022,4,24,17,13,3) ,iden= 1, timerate= 10)
+    #L1 = Life(Name = "Tony Stark", Mass =  65 , Shape="Human shape" , location=Location("Earth-617" , EL1) , matterState="mul" ,state="r" ,MindState=False ,age = 50 ,Souls=Souls1 ,Strength= 40, Limit_Strength=250,Pain_limit=210,propertime=Time(2022,4,24,17,13,3) ,iden= 1, timerate= 10)
     #S1 = Space_Stone(L1 , "NYC")
     #S1.TeleportOwner("Paris")
     #print(L1)
@@ -1657,11 +1758,27 @@ if __name__ == '__main__':
 
     UniCoor = Polar_Coordinates()
     UniCoor.Set_Position(0,0,0)
+
+    UniCoor1 = Polar_Coordinates()
+    UniCoor1.Transfer_limit(UniCoor.Show_limit())
+    UniCoor1.Set_Position(9,8,7)
+
     LD = LocateData()
     LD.Config_dict_mul(179867,("R" , EarthCoor))
     LD.Config_dict_mul(717 , ("SR" , {"Earth" : EarthCoor} , UniCoor ) )
     LD.Config_dict_mul(4568 ,("SR" , {"457" : EarthCoor}) )
     print(LD.dict_mul)
+    LC = Location(dicdata= LD)
+    LC.Set_Location(Mul_ID= "179867" , local= EL3)
+    print(LC)
+    LC1 = Location(dicdata=LD)
+    LC1.Set_Location(Mul_ID= "717" , Super_coor= UniCoor1 , local = EarthCoor, nameLocal="Earth")
+    print(LC1)
+    LC2 = Location(dicdata=LD)
+    LC2.Set_Location(Mul_ID= "4568" , local= EarthCoor , SuperID= "457")
+    print(LC2)
+
+
     '''
     #w1.lifelst = [L1]
     #print(w1)
