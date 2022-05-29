@@ -231,7 +231,7 @@ class Polar_Coordinates:
 
 
     def Set_limit_r(self , limr = tuple):
-        print(limr)
+
         if len(limr) == 2:
             if all(x >= 0 for x in limr) == True :
                 pass
@@ -519,7 +519,7 @@ class Location:
         st= ""
         for k,v in dic.items():
             checklst.append((k,v))
-        print(checklst)
+        #print(checklst)
         for i in checklst:
             if isinstance(i[1] , Polar_Coordinates) == True or isinstance(i[1], Cartesian_Coordinates):
                 st += f"{i[0]} : {i[1]} "
@@ -529,6 +529,11 @@ class Location:
                 pass
 
         return st
+
+
+
+
+
 
 
 
@@ -650,7 +655,7 @@ class Matter:
 
 
 class Life(Matter):
-  def __init__(self , Name = str  ,Mass = float , Shape = str , location = str ,matterState = str,state = str ,  MindState = bool , age = float , Souls = Soul,Strength = float,Limit_Strength = float,Pain_limit = float,propertime= Time,timerate = int,exprset= {} , **kwargs):
+  def __init__(self , Name = str  ,Mass = float , Shape = str , location = Location ,matterState = str,state = str ,  MindState = bool , age = float , Souls = Soul,Strength = float,Limit_Strength = float,Pain_limit = float,propertime= Time,timerate = int,exprset= {} , **kwargs):
       super().__init__(Name ,Mass, Shape , location, matterState , state,propertime, timerate,exprset,  **kwargs)
 
       self.MindState = MindState #Control by a mind stone or not? (T/F)
@@ -695,10 +700,10 @@ class Life(Matter):
 
 
 class Reality: #Create your own reality simulation world (When using reality stone) , ilusion reality
-    def __init__(self,name , theme ,state, timeIllu = None , Temp = float , lifelist = list ,matter_list = list , propertime= Time, timerate = int ,Multiverse = [] , exprdict = {},Coordinate = Cartesian_Coordinates or Polar_Coordinates, **kwargs): #lifelist and matter_list is all the life or the matter inside this reality object (just SOME specific object)
+    def __init__(self,name , theme ,state, location = Location, timeIllu = None , Temp = float , propertime= Time, timerate = int ,Multiverse = [] , exprdict = {},World_Type = str, **kwargs): #lifelist and matter_list is all the life or the matter inside this reality object (just SOME specific object)
         self.name= name
 
-        self.location = None #Position in space
+        self.location = location #Position in space
 
 
         self.theme = theme
@@ -710,15 +715,13 @@ class Reality: #Create your own reality simulation world (When using reality sto
         self.Temp = Temp
 
 
-        if all(x == 0 for x in Coordinate.Show_position()) == True:
-            self.Coordinate = Coordinate
-        elif all(x == 0 for x in Coordinate.Show_position()) == False:
-            raise Exception("Coordinate setting require every value to be 0 ")
 
 
+        self.World_Type = World_Type # W => World , SW => Sub-world
+        self.matter_list = list
+        self.lifelist = list
 
-
-
+        '''
         if all(isinstance(k , Life) for k in lifelist) == True and all(k.location.World_name == self.name and type(k.location.Local) == type(self.Coordinate) for k in lifelist) == True :
             if self.location == None:
                 if all(k.location.Local.Show_limit() == self.Coordinate.Show_limit() for k in lifelist) == True:
@@ -749,29 +752,16 @@ class Reality: #Create your own reality simulation world (When using reality sto
             self.matter_list = matter_list
         else:
             print("all matter should be matter object all matter object should be in the same location as the world")
+        '''
 
         self.propertime = propertime
-        if all(x.timerate == timerate for x in lifelist) == True and all(x.timerate == timerate for x in matter_list) == True:
-            self.timerate = timerate
-        else:
-            #print("In that reality and that location ,everything have the same time rate")
+        self.timerate = timerate
 
-            for x in lifelist:
-                if x.timerate == timerate:
-                    pass
-                elif x.timerate != timerate:
-                    self.lifelist.remove(x)
 
-            for x in matter_list:
-                if x.timerate == timerate:
-                    pass
-                elif x.timerate != timerate:
-                    self.matter_list.remove(x)
 
-            self.timerate = timerate
-            self.exprdict = exprdict
-            self.ValueFromExp = {}
-            self.kw=  kwargs
+        self.exprdict = exprdict
+        self.ValueFromExp = {}
+        self.kw=  kwargs
 
         '''
         if isinstance(Coordinate, Cartesian_Coordinates) == True:
@@ -803,31 +793,70 @@ class Reality: #Create your own reality simulation world (When using reality sto
             elif isinstance(i ,Life) ==False:
                 lifelist.remove(i)
                 raise Exception(f"{i} , all life should be life object")
-            if  all(k.location.World_name == self.name and type(k.location.Local) == type(self.Coordinate) and k.location.Local.Show_limit() == self.Coordinate.Show_limit() for k in lifelist) == True:
+            if  all(type(k.location.local) == type(self.Coordinate) and k.location.local.Show_limit() == self.Coordinate.Show_limit() for k in lifelist) == True:
                 pass
-            elif  all(k.location.World_name == self.name and type(k.location.Local) == type(self.Coordinate) and k.location.Local.Show_limit() == self.Coordinate.Show_limit() for k in lifelist) == False:
+            elif  all(type(k.location.local) == type(self.Coordinate) and k.location.local.Show_limit() == self.Coordinate.Show_limit() for k in lifelist) == False:
                 lifelist.remove(i)
                 #raise Exception(f"{i} , all life object should be in the same location as the world")
         self.lifelist = lifelist
 
+        for x in lifelist:
+            if x.timerate == self.timerate:
+                pass
+            elif x.timerate != self.timerate:
+                self.lifelist.remove(x)
+
+
+
 
     @matter_lst.setter
     def matter_lst(self ,matter_list = list):
+
         for i in matter_list.copy():
-            if isinstance(i, Life) == True:
+            if isinstance(i, Matter) == True:
                 pass
-            elif isinstance(i ,Life) ==False:
+            elif isinstance(i ,Matter) ==False:
                 matter_list.remove(i)
                 raise Exception(f"{i} , all matter should be matter object")
-            if  all(k.location.World_name == self.name and type(k.location.Local) == type(self.Coordinate) and k.location.Local.Show_limit() == self.Coordinate.Show_limit() for k in matter_list) == True:
+
+            if  all(type(k.location.local) == type(self.Coordinate) and k.location.local.Show_limit() == self.Coordinate.Show_limit() for k in matter_list) == True:
                 pass
-            elif  all(k.location.World_name == self.name and type(k.location.Local) == type(self.Coordinate) and k.location.Local.Show_limit() == self.Coordinate.Show_limit() for k in matter_list) == False:
+            elif all(type(k.location.local) == type(self.Coordinate) and k.location.local.Show_limit() == self.Coordinate.Show_limit() for k in matter_list) == False:
                 matter_list.remove(i)
                 #raise Exception(f"{i} , all matter object should be in the same location as the world")
         self.matter_list = matter_list
 
+        for x in matter_list:
+            if x.timerate == self.timerate:
+                pass
+            elif x.timerate != self.timerate:
+                self.matter_list.remove(x)
 
-    def LocateSet(self , location = Location):
+
+    def Coordinate_Set(self , coordinate = Polar_Coordinates or Cartesian_Coordinates):
+        Type = self.World_Type
+        dic = self.location.__dict__
+        if Type == "W":
+            if type(dic["local"]) == type(coordinate) and dic["local"].Show_limit() == coordinate.Show_limit():
+                self.Coordinate = coordinate
+            else:
+                raise Exception("The coordinate should be the same as the local world in the location object")
+
+        elif Type == "SW":
+            if type(dic["local"]) == type(coordinate):
+                for w ,sw in zip(dic["local"].Show_limit(), coordinate.Show_limit()):
+                    if w[0] <= sw[0] < sw[1] <= w[1]:
+                        pass
+                    else:
+                        raise Exception("Limit should be the same or lower")
+                self.Coordinate = coordinate
+            else:
+                raise Exception("The coordinate of a sub world should be the same as the larger one.")
+
+
+
+
+    """
         if type(location.Local) == type(self.Coordinate): #Where this little world is on the large world
             for c,w in zip(self.Coordinate.Show_limit(), location.Local.Show_limit()):
                 if c[0] <= w[0] < w[1] <= c[1]:
@@ -837,8 +866,9 @@ class Reality: #Create your own reality simulation world (When using reality sto
             self.location = location
         else:
             raise Exception("Need to be in the same world and use the same coordinate and limit")
-
         """
+
+    """
         Explanation of the Coordinate system
         Reality coordinate : The ID map of world that is intercommunicated and interrelated in some super reality
         Local coordinate:
@@ -1763,6 +1793,14 @@ if __name__ == '__main__':
     UniCoor1.Transfer_limit(UniCoor.Show_limit())
     UniCoor1.Set_Position(9,8,7)
 
+    EC1 = Polar_Coordinates()
+    EC1.Transfer_limit(EarthCoor.Show_limit())
+    EC1.Set_Position(80,90,56)
+
+    EC2 = Polar_Coordinates()
+    EC2.Transfer_limit(EarthCoor.Show_limit())
+    EC2.Set_Position(80,95,56)
+
     LD = LocateData()
     LD.Config_dict_mul(179867,("R" , EarthCoor))
     LD.Config_dict_mul(717 , ("SR" , {"Earth" : EarthCoor} , UniCoor ) )
@@ -1777,8 +1815,25 @@ if __name__ == '__main__':
     LC2 = Location(dicdata=LD)
     LC2.Set_Location(Mul_ID= "4568" , local= EarthCoor , SuperID= "457")
     print(LC2)
+    LC3 = Location(dicdata=LD)
+    LC3.Set_Location(Mul_ID= "717" , Super_coor= UniCoor1 , local = EC1 , nameLocal="Earth")
+    LC4 = Location(dicdata=LD)
+    LC4.Set_Location(Mul_ID= "717" , Super_coor= UniCoor1 , local = EC2 , nameLocal="Earth")
 
+    WandaWorld = Polar_Coordinates()
+    WandaWorld.Set_limit_r((0, 6.317E+06))
+    WandaWorld.Set_limit_t((40 ,50))
+    WandaWorld.Set_limit_p((35 , 90))
 
+    L1 = Life(Name = "Tony Stark", Mass =  65 , Shape="Human shape" , location=LC3, matterState="mul" ,state="r" ,MindState=False ,age = 50 ,Souls=Souls1 ,Strength= 40, Limit_Strength=250,Pain_limit=210,propertime=Time(2022,4,24,17,13,3) ,iden= 1, timerate= 20)
+    M1 = Matter(Name="Ultron" ,Mass= 80 , Shape ="Droid shape" , location = LC4 , matterState="mul" ,state ="r" ,propertime= Time(2022,4,24,17,13,3) ,timerate= 20 ,iden = 1)
+    W1 = Reality(name= "Earth-717" , theme = "Planet" ,state= "r" ,Temp = 15 , propertime = Time(2022,4,24,17,13,3) ,timerate = 20 , World_Type="SW" , location= LC1)
+
+    W1.Coordinate_Set(coordinate=WandaWorld)
+    W1.lifelst = [L1]
+    W1.matter_lst = [M1]
+
+    #print(W1.lifelst)
     '''
     #w1.lifelst = [L1]
     #print(w1)
