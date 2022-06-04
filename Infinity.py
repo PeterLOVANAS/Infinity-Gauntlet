@@ -6,6 +6,7 @@ import copy
 import numpy as np
 import pyjack
 from math import *
+import openai
 
 #Add new Infinity Gauntlet
 #Add NEW extension
@@ -197,7 +198,7 @@ class Cartesian_Coordinates:
             pass
 
     def Check_Default(self):
-        if self.x == self.y == self.z == 0:
+        if self.x == self.y == self.z == 0 or self.x == self.y == self.z == None:
             return True
         else:
             return False
@@ -315,7 +316,7 @@ class Polar_Coordinates:
         return (self.r, self.t,  self.p)
 
     def Check_Default(self):
-        if self.r == self.t == self.p == 0:
+        if self.r == self.t == self.p == 0 or  self.r == self.t == self.p == None:
             return True
         else:
             return False
@@ -1145,7 +1146,7 @@ class Multiverse:
 
 
 class infinity_Stones:
-    def __init__(self , Owner = Life , location = str , Color = str, Ability = str): #Stone location doesn't always equal to owner location
+    def __init__(self , Owner = Life , location = Location , Color = str, Ability = str): #Stone location doesn't always equal to owner location
         self.location = location
         self.Owner = Owner
         self._Color = Color
@@ -1174,20 +1175,31 @@ class Space_Stone(infinity_Stones):
         self.checking_of_usage()
         if all(isinstance(x , Life) for x in what) == True:
           pass
-        if all(isinstance(x , Matter) for x in what) == True:
+        elif all(isinstance(x , Matter) for x in what) == True:
           pass
         else:
-          print("Must be a life or matter object")
+          raise Exception("Must be a life or matter object")
           
         if len(Origin) == len(Destination) == len(what):
           pass
         else : 
-          print("The len is not equal")
+          raise Exception("The len is not equal")
+
+        if all(isinstance(x , Location) for x in Destination) == True:
+          pass
+        else:
+          raise Exception("Destination must be a Location object")
+
+        if all(isinstance(x , Location) for x in Origin) == True:
+          pass
+        else:
+          raise Exception("Origin must be a Location object")
           
         for O ,D ,W in zip(Origin , Destination , what):
-          print(f"{W} have travel from {O} to {D}")
+          print(f"{W.Name} have travel from [{O}] to [{D}]")
           W.location = D
-    
+
+    '''
     def SingleOrigin(self , des , wh = set, ori = str): #Multiple Destination  
         tlst = []
         if len(wh) == len(des):
@@ -1216,7 +1228,7 @@ class Space_Stone(infinity_Stones):
           tlst1.append(ori)
           tlst2.append(des)
         self.Teleport(tlst1  , tlst2 , wh)
-        
+    '''
           
     def TeleportOwner(self ,des = str): #This is for owner who have only himself and the space stone ,if the owner have other things to teleport with, please use self.Teleport()
 
@@ -1266,6 +1278,24 @@ class Mind_Stone(infinity_Stones):
             Returnlst.append(tup)
 
         return Returnlst
+
+    def Asking(self , query = str):
+        openai.api_key = "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"
+        response = openai.Completion.create(
+        engine="text-davinci-002" ,
+        prompt = query ,temperature = 0.1 , max_tokens = 1000 , top_p = 1 ,frequency_penalty  =0 ,presence_penalty = 0)
+        content = response.choices[0].text.split(".")
+        return response.choices[0].text
+
+    def MultipleQuery(self):
+        while True:
+            q = input("Asking the Mind Stone :  ")
+            if q == "nq":
+                break
+            elif q != "nq":
+                answer = self.Asking(q)
+                print(answer)
+
         
 
 class Soul_Stone(infinity_Stones):
@@ -1459,8 +1489,8 @@ class Reality_Stone(infinity_Stones):
 
         return Ans
 
-    def create_Matter(self , Name = str  ,Mass = float , Shape = str , location = str ,matterState = str ,state = str, **kwargs):
-        return Matter(Name , Mass , Shape , location , matterState , state , **kwargs)
+    def create_Matter(self ,Name = str  ,Mass = float , Shape = str , location = Location ,matterState = str,state = str,propertime = Time,timerate= int,exprdict = {},iden = int, **kwargs):
+        return Matter(Name , Mass , Shape , location , matterState , state ,propertime, timerate,exprdict,iden, **kwargs)
 
     def Function_Matter(self , expr = str):
         return RealityType(expr)
@@ -1488,7 +1518,7 @@ class Reality_Stone(infinity_Stones):
     def Copied_Matter(self, Matters = Matter , num_copied =  int):
         Matlist = []
         for i in range(num_copied):
-            Mat = Matters.copy()
+            Mat = copy.deepcopy(Matters)
             Matlist.append(Mat)
         return Matlist
 
@@ -1801,10 +1831,20 @@ if __name__ == '__main__':
     EC2.Transfer_limit(EarthCoor.Show_limit())
     EC2.Set_Position(80,95,56)
 
+    WandaWorld = Polar_Coordinates()
+    WandaWorld.Set_limit_r((0, 6.317E+06))
+    WandaWorld.Set_limit_t((40 ,50))
+    WandaWorld.Set_limit_p((35 , 90))
+
+    WandaCoor= Polar_Coordinates()
+    WandaCoor.Transfer_limit(WandaWorld.Show_limit())
+    WandaCoor.Set_Position(2,43,50)
+
     LD = LocateData()
     LD.Config_dict_mul(179867,("R" , EarthCoor))
-    LD.Config_dict_mul(717 , ("SR" , {"Earth" : EarthCoor} , UniCoor ) )
+    LD.Config_dict_mul(717 , ("SR" , {"Earth" : EarthCoor , "The Hex" : WandaWorld} , UniCoor ) )
     LD.Config_dict_mul(4568 ,("SR" , {"457" : EarthCoor}) )
+
     print(LD.dict_mul)
     LC = Location(dicdata= LD)
     LC.Set_Location(Mul_ID= "179867" , local= EL3)
@@ -1820,18 +1860,33 @@ if __name__ == '__main__':
     LC4 = Location(dicdata=LD)
     LC4.Set_Location(Mul_ID= "717" , Super_coor= UniCoor1 , local = EC2 , nameLocal="Earth")
 
-    WandaWorld = Polar_Coordinates()
-    WandaWorld.Set_limit_r((0, 6.317E+06))
-    WandaWorld.Set_limit_t((40 ,50))
-    WandaWorld.Set_limit_p((35 , 90))
+
+
+    LC5 =  Location(dicdata=LD)
+    LC5.Set_Location(Mul_ID="717" , Super_coor= UniCoor1 , local= WandaCoor , nameLocal="The Hex")
+
 
     L1 = Life(Name = "Tony Stark", Mass =  65 , Shape="Human shape" , location=LC3, matterState="mul" ,state="r" ,MindState=False ,age = 50 ,Souls=Souls1 ,Strength= 40, Limit_Strength=250,Pain_limit=210,propertime=Time(2022,4,24,17,13,3) ,iden= 1, timerate= 20)
     M1 = Matter(Name="Ultron" ,Mass= 80 , Shape ="Droid shape" , location = LC4 , matterState="mul" ,state ="r" ,propertime= Time(2022,4,24,17,13,3) ,timerate= 20 ,iden = 1)
     W1 = Reality(name= "Earth-717" , theme = "Planet" ,state= "r" ,Temp = 15 , propertime = Time(2022,4,24,17,13,3) ,timerate = 20 , World_Type="SW" , location= LC1)
-
+    L2 = Life(Name = "Tony Stark", Mass =  65 , Shape="Human shape" , location=LC5, matterState="mul" ,state="r" ,MindState=False ,age = 50 ,Souls=Souls1 ,Strength= 40, Limit_Strength=250,Pain_limit=210,propertime=Time(2022,4,24,17,13,3) ,iden= 1, timerate= 20)
     W1.Coordinate_Set(coordinate=WandaWorld)
-    W1.lifelst = [L1]
+
+    W1.lifelst = [L2]
     W1.matter_lst = [M1]
+    print(W1)
+
+    S1 = Space_Stone(L1,LC3)
+    S1.Teleport([LC3] , [LC4], {L1})
+
+    S2 = Reality_Stone(L1,LC3)
+    klst= S2.Copied_Matter(M1 , 3)
+    klst[0].Name = "Infinity Ultron"
+    print(klst[0])
+    print(klst[1])
+
+    S3 = Mind_Stone(L1 , LC3)
+    S3.MultipleQuery()
 
     #print(W1.lifelst)
     '''
