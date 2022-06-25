@@ -1247,6 +1247,7 @@ class Mind_Stone(infinity_Stones):
 
     def __init__(self, Owner, location, Color = "Yellow", Ability = "Control Minds"):
         super().__init__(Owner, location, Color, Ability)
+        self.API_key = str
 
     def ControlState(self, Target, time):
         checklst=  []
@@ -1280,7 +1281,7 @@ class Mind_Stone(infinity_Stones):
         return Returnlst
 
     def Asking(self , query = str):
-        openai.api_key = "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"
+        openai.api_key = self.API_key
         response = openai.Completion.create(
         engine="text-davinci-002" ,
         prompt = query ,temperature = 0.1 , max_tokens = 1000 , top_p = 1 ,frequency_penalty  =0 ,presence_penalty = 0)
@@ -1886,7 +1887,7 @@ if __name__ == '__main__':
     print(klst[1])
 
     S3 = Mind_Stone(L1 , LC3)
-    S3.MultipleQuery()
+
 
     #print(W1.lifelst)
     '''
