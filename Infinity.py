@@ -1080,13 +1080,34 @@ class Timeline:
 
 
 class Universe:
-    def __init__(self , Reality_list = list):
-        if all(isinstance(x , Reality) for x in Reality_list) == True:
-            self.Reality_list = Reality_list
-        elif all(isinstance(x , Reality) for x in Reality_list) == False:
-            raise Exception("All element in reality list should be Reality type object")
+    def __init__(self,Mul_ID = str, dicdata = LocateData):
+        self.Reality_set = set()
+        self.Mul_ID = Mul_ID
+        self.Entire_Lifelst = []
+        self.population = int
+        self.info = dicdata.dict_mal[self.Mul_ID] # <= The info contains the locational information of that universe.
 
-class Multiverse:
+
+    def Add(self , reality = Reality):
+        Loca = reality.location
+        Mulu_ID = Loca.Mul_ID
+        state = Loca.dicdata[Mulu_ID][0]
+        if Mulu_ID == self.Mul_ID and state == "SR":
+            self.Reality_set.add(reality)
+        else:
+            raise Exception("The world should have the same multiversal ID (indicates that it's in the same universe) and it should be in super reality state")
+
+        self.Entire_Lifelst += reality.lifelst
+        self.population = len(self.Entire_Lifelst)
+
+    def Add_list(self , rea_set = set):
+        for i in rea_set:
+            self.Add(i)
+
+
+
+
+class Multitimeline:
     def __init__(self , tl_list = list):
         # {location1 : {starttime1 : Timeline , starttime2 : Timeline} , location2 : {starttime1 : Timeline , starttime2 : Timeline}}
         wsame = []
@@ -1250,6 +1271,7 @@ class Mind_Stone(infinity_Stones):
         self.API_key = str
 
     def ControlState(self, Target, time):
+        self.checking_of_usage()
         checklst=  []
         for k,t in zip(Target , time):
             if t <= 10 :
@@ -1262,6 +1284,7 @@ class Mind_Stone(infinity_Stones):
         return  MindType(checklst)
       
     def ControlOrder(self ,Minded, order = dict):
+        self.checking_of_usage()
         OrderList = []
         Returnlst=  []
         if isinstance(Minded , MindType) == True:
@@ -1281,6 +1304,7 @@ class Mind_Stone(infinity_Stones):
         return Returnlst
 
     def Asking(self , query = str):
+        self.checking_of_usage()
         openai.api_key = self.API_key
         response = openai.Completion.create(
         engine="text-davinci-002" ,
@@ -1289,6 +1313,7 @@ class Mind_Stone(infinity_Stones):
         return response.choices[0].text
 
     def MultipleQuery(self):
+        self.checking_of_usage()
         while True:
             q = input("Asking the Mind Stone :  ")
             if q == "nq":
@@ -1307,6 +1332,7 @@ class Soul_Stone(infinity_Stones):
     # Identify spirit (check at the state), resurrect (Change states) , split spirit (Copied object ,and make the state to "s" and the control status to T) , control (check the control status and make it to T)
     # Souls have 3 states : 1.Split 2.Death 3.Alive
     def check_state(self , souls):
+        self.checking_of_usage()
         Anslst = []
         dicti = {"s" : "split" , "d" : "death" , "a" : "alive"}
         for i in souls :
@@ -1317,6 +1343,7 @@ class Soul_Stone(infinity_Stones):
         return Anslst
         
     def check_controlStatus(self , souls):
+        self.checking_of_usage()
         Anslst = []
         for i in souls :
           tupans = (i.name , i.control_status)
@@ -1324,6 +1351,7 @@ class Soul_Stone(infinity_Stones):
         return Anslst
     
     def change_state(self , souls , new_state):
+        self.checking_of_usage()
         Anslst = []
         if len(souls) == len(new_state):
           pass
@@ -1340,13 +1368,15 @@ class Soul_Stone(infinity_Stones):
         return Anslst
         
     def show_Souls(self , souls):
-      Anslst = []
-      for i in souls:
-        tup = (i.name , i.control_status , i.state)
-        Anslst.append(tup)
-      return Anslst
+        self.checking_of_usage()
+        Anslst = []
+        for i in souls:
+            tup = (i.name , i.control_status , i.state)
+            Anslst.append(tup)
+        return Anslst
       
     def Split_Souls(self , numcop):
+        self.checking_of_usage()
         Anslst = []
         #SplitSoul = Soul(name = self.Owner  , control_status = True , state = "s")
         for i in range(numcop):
@@ -1355,6 +1385,7 @@ class Soul_Stone(infinity_Stones):
         return Anslst
         
     def change_ControlStatus(self, souls ,new_state):
+        self.checking_of_usage()
         Anslst = []
         if len(souls) == len(new_state):
           pass
@@ -1370,6 +1401,7 @@ class Soul_Stone(infinity_Stones):
         return Anslst
           
     def trapped(self , souls):
+      self.checking_of_usage()
       World = self.__Pool
       for i in souls:
         i.control_status = True
@@ -1377,12 +1409,14 @@ class Soul_Stone(infinity_Stones):
       return World
       
     def Show_trapped(self):
+      self.checking_of_usage()
       world = self.__Pool
       show = world.copy()
       Ans = self.show_Souls(show)
       return Ans
     
     def RemovePool(self , souls):
+      self.checking_of_usage()
       World = self.__Pool
       for k in souls:
         World.remove(k)
@@ -1394,6 +1428,7 @@ class Reality_Stone(infinity_Stones):
         super().__init__(Owner, location, Color, Ability)
 
     def show_reality(self , World = list):
+        self.checking_of_usage()
         Anslst = []
         Realdict=  {"r" : "real" , "i" : "illusion"}
         if all(isinstance(w , Reality) for w in World) == True:
@@ -1407,7 +1442,7 @@ class Reality_Stone(infinity_Stones):
 
     def create_Illusion(self , location = list , theme = list , timeIllu = list , Temp = list , lifelist=  list , matter_list = list): #If you don't have timeIIlu for that reality so  put "None" for that reality in the list
         Worldlst = []
-
+        self.checking_of_usage()
         if len(location) == len(theme) == len(Temp) == len(lifelist) == len(matter_list) == len(timeIllu):
             pass
         else:
@@ -1438,6 +1473,7 @@ class Reality_Stone(infinity_Stones):
 
     def inactivate(self , Worlds = list , Worlds_before = list): #Inactivate the Reality stone and make the illusion reality become normal
         Ans = []
+        self.checking_of_usage()
         if len(Worlds) == len(Worlds_before):
             pass
         elif len(Worlds) != len(Worlds_before):
@@ -1491,13 +1527,16 @@ class Reality_Stone(infinity_Stones):
         return Ans
 
     def create_Matter(self ,Name = str  ,Mass = float , Shape = str , location = Location ,matterState = str,state = str,propertime = Time,timerate= int,exprdict = {},iden = int, **kwargs):
+        self.checking_of_usage()
         return Matter(Name , Mass , Shape , location , matterState , state ,propertime, timerate,exprdict,iden, **kwargs)
 
     def Function_Matter(self , expr = str):
+        self.checking_of_usage()
         return RealityType(expr)
 
     def Transmute(self , Matters = list , Shapes = list , matterStates = list): #paramter : Shape , matterState , MatterWantToChange #for the abilities of the matter you can create the expr for it as the same as before transmute
         translist =  []
+        self.checking_of_usage()
         if len(Matters) == len(Shapes) == len(matterStates):
             pass
         else:
@@ -1517,6 +1556,7 @@ class Reality_Stone(infinity_Stones):
         #The abillity of both life and matter object still be the same. Transmute() cannot change soul or mind of life object
 
     def Copied_Matter(self, Matters = Matter , num_copied =  int):
+        self.checking_of_usage()
         Matlist = []
         for i in range(num_copied):
             Mat = copy.deepcopy(Matters)
@@ -1524,6 +1564,7 @@ class Reality_Stone(infinity_Stones):
         return Matlist
 
     def create_illusionMatter(self, Matters): #Matter or life object
+        self.checking_of_usage()
         if isinstance(Matters , Matter) == True or isinstance(Matters , Life) == True:
             pass
         else:
@@ -1536,6 +1577,7 @@ class Time_Stone(infinity_Stones):
         super().__init__(Owner, location, Color, Ability)
 
     def Forward_Reverse(self , Tlo = Timeline , tw = Time , objlst = list , world  =Reality , indexlst = []):
+        self.checking_of_usage()
         tl = Tlo.timeline
         if tw in list(tl.keys()):
             pass
@@ -1559,6 +1601,7 @@ class Time_Stone(infinity_Stones):
             pyjack.replace_all_refs(l , objlsttl[i])
 
     def Change_TimeRate(self , objlst = list , world = Reality, tr = list): #This include slow, freeze or increase time rate
+        self.checking_of_usage()
         if len(tr) == len(objlst):
             pass
         elif len(tr) != len(objlst):
@@ -1572,18 +1615,21 @@ class Time_Stone(infinity_Stones):
             i.timerate = r
 
     def FreezeTime(self, objlst = list , world = Reality):
+        self.checking_of_usage()
         lst = []
         for i in range(len(objlst)):
             lst.append(0)
         self.Change_TimeRate(objlst= objlst , world = world , tr = lst)
 
     def Observe_Timeline(self , World = Reality):
+        self.checking_of_usage()
         # Start time should all be the same in all possible timeline in the Multiverse
         Multiverse = World.Multiverse
         for ele in Multiverse:
             print(ele)
 
     def Timeloop(self , st = Time , ft= Time ,expr = str , interObj = list ,tS = list,World = Reality, **kwargs):
+        self.checking_of_usage()
         tl = Timeline(World)
         lst = interObj.copy()
         lsti = interObj
@@ -1659,6 +1705,7 @@ class Power_Stone(infinity_Stones):
         super().__init__(Owner, location,  Color, Ability)
 
     def Pain_inducement(self , life = Life):
+        self.checking_of_usage()
         lim_s = life.Limit_Strength
         lim_p = life.Pain_limit
         #s = life.Strength
@@ -1668,6 +1715,7 @@ class Power_Stone(infinity_Stones):
         life.__init__(**k)
 
     def Overload_Strength(self , life = Life):
+        self.checking_of_usage()
         lim_s = life.Limit_Strength
         k = life.__dict__.copy()
         addi = lim_s + 50
@@ -1676,6 +1724,7 @@ class Power_Stone(infinity_Stones):
         life.__init__(**k)
 
     def Projection(self , target = Life):
+        self.checking_of_usage()
         lim_s = target.Limit_Strength
         s = target.Strength
         k = target.__dict__.copy()
@@ -1685,6 +1734,7 @@ class Power_Stone(infinity_Stones):
         target.__init__(**k)
 
     def Matter_destruction(self , target = Matter or Life):
+        self.checking_of_usage()
         if isinstance(target , Matter) == True:
             k = target.__dict__.copy()
             k["matterState"] = "cr"
@@ -1699,6 +1749,7 @@ class Power_Stone(infinity_Stones):
             target.__init__(**k)
 
     def Planet_destruction(self , World = Reality):
+        self.checking_of_usage()
         liflst = World.lifelist
         matlst = World.matter_list
         klst = []
@@ -1715,8 +1766,21 @@ class Power_Stone(infinity_Stones):
         World.__init__(**k)
 
 
-class infinity_gauntlet:
-    def __init__(self):
+class infinity_gauntlet(Matter):
+    def __init__(self,Owner = Life ,  Name = "Infinity Gauntlet" ,Mass = float , Shape = "Gauntlet" , location = Location ,matterState = str,state = str , Limit_Strength_Mat = float ,propertime= Time,timerate = int,exprset= {} , **kwargs):
+        super().__init__(Name ,Mass, Shape , location, matterState , state,propertime, timerate,exprset,  **kwargs)
+        self.Limit_Strength_Mat = Limit_Strength_Mat
+        self.Owner = Owner
+
+        if self.Limit_Strength_Mat >= 1000:
+            pass
+        else:
+            raise Exception("The object should designed to channel and hold infinity stones")
+
+        if self.Owner.Souls.state in ["a", "p"]:
+            pass
+        else:
+            raise Exception("The owner should still alive or in pain condition in order to hold the infinity stones")
 
         self.Time_stone = None
         self.Power_stone = None
@@ -1727,7 +1791,7 @@ class infinity_gauntlet:
         #raise(AttributeError("Maybe your aren't collect that stone yet"))
 
 
-    def Stones(self ,stones = set):
+    def Stones(self ,stones = set): # Put the Stones into the gauntlet
         self.Time_stone = None
         self.Power_stone = None
         self.Reality_stone = None
@@ -1757,10 +1821,54 @@ class infinity_gauntlet:
             elif isinstance(i , Soul_Stone) == True:
                 self.Soul_stone = i
 
+    def Create_Life(self, Name = str  ,Mass = float , Shape = str , location = Location ,matterState = str,state = str ,  MindState = bool , age = float , Souls = Soul,Strength = float,Limit_Strength = float,Pain_limit = float,propertime= Time,timerate = int,exprset= {} , **kwargs):
+        if isinstance(self.Reality_stone , Reality_Stone) == True and isinstance(self.Soul_stone , Soul_Stone) == True:
+            pass
+        else:
+            raise Exception("In order to create life object, you need to have reality and soul stone in the gauntlet.")
 
-    #def time_stone(self):
-   #     for i in self.stones:
-    #        if isinstance(i , Time_Stone) == True:
+        L = Life(Name = Name  ,Mass = Mass , Shape = Shape , location = location ,matterState = matterState,state = state ,  MindState = MindState , age = age , Souls = Souls ,Strength = Strength,Limit_Strength = Limit_Strength,Pain_limit = Pain_limit,propertime= propertime,timerate = timerate,exprset= exprset , **kwargs)
+        return L
+
+
+    def Snap(self , universe = Universe): # Simulate Thanos's snap
+
+        if isinstance(self.Reality_stone , Reality_Stone) == True and isinstance(self.Soul_stone , Soul_Stone) == True and isinstance(self.Time_stone , Time_Stone) == True and isinstance(self.Mind_stone , Mind_Stone) == True and isinstance(self.Space_stone , Space_Stone) == True and isinstance(self.Power_stone , Power_Stone) == True:
+            pass
+        else:
+            raise Exception("In order to snap, you need to have all of the infinity stones in the gauntlet.")
+
+        to_delete = set(rand.sample(range(len(universe.Entire_Lifelst)), (universe.population) // 2 )) # Random a number of existed INDEX
+        left_pop = [x for i,x in enumerate(universe.Entire_Lifelst) if i not in to_delete] # we won't include the index number that included in to_delete
+
+        # Key: Each reality inside this universe should lose the lost population as well
+
+        # Generate Lifelist that is deleted in this universe
+        BLlst = [] # Bad luck list
+        for i,x in enumerate(universe.Entire_Lifelst):
+            if i in to_delete:
+                BLlst.append(x)
+            elif i not in to_delete:
+                pass
+
+        # Delete in each reality (e.g. planet) in that universe
+        for u in universe.Reality_set:
+            for i1 in BLlst:
+                if i1 in u.lifelist:
+                    New_lifelst = u.lifelist.remove(i1)
+                    u.lifelst = New_lifelst # <= Update the lifelist in each reality
+
+                elif i1 not in BLlst:
+                    pass
+
+        # Update lifelist and population of the entire universe
+        universe.Entire_Lifelist = left_pop
+        universe.population = len(left_pop)
+
+
+        return left_pop
+
+
 
 
 
@@ -1867,6 +1975,10 @@ if __name__ == '__main__':
     LC5.Set_Location(Mul_ID="717" , Super_coor= UniCoor1 , local= WandaCoor , nameLocal="The Hex")
 
 
+    LC6 = Location(dicdata=LD)
+    LC6.Set_Location(Mul_ID="717" , Super_coor=UniCoor1) # Example of the location of the asteroids in space (Unicoor1).
+    print(LC6)
+
     L1 = Life(Name = "Tony Stark", Mass =  65 , Shape="Human shape" , location=LC3, matterState="mul" ,state="r" ,MindState=False ,age = 50 ,Souls=Souls1 ,Strength= 40, Limit_Strength=250,Pain_limit=210,propertime=Time(2022,4,24,17,13,3) ,iden= 1, timerate= 20)
     M1 = Matter(Name="Ultron" ,Mass= 80 , Shape ="Droid shape" , location = LC4 , matterState="mul" ,state ="r" ,propertime= Time(2022,4,24,17,13,3) ,timerate= 20 ,iden = 1)
     W1 = Reality(name= "Earth-717" , theme = "Planet" ,state= "r" ,Temp = 15 , propertime = Time(2022,4,24,17,13,3) ,timerate = 20 , World_Type="SW" , location= LC1)
@@ -1886,7 +1998,8 @@ if __name__ == '__main__':
     print(klst[0])
     print(klst[1])
 
-    S3 = Mind_Stone(L1 , LC3)
+
+
 
 
     #print(W1.lifelst)
